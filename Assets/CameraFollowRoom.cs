@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class CameraFollowRoom : MonoBehaviour
 {
-    public Transform player;   // Assign your player here
+    public Transform player;  
 
     private Vector2Int lastRoom;
 

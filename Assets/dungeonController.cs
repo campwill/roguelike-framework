@@ -5,11 +5,17 @@ public class DungeonGenerator : MonoBehaviour
 {
     [Header("Dungeon Settings")]
     public GameObject roomPrefab;       
-    public int width = 5;               
-    public int height = 5;              
+            
     public int maxRooms = 12;
 
     private int roomsPlaced = 0;
+    private Vector2Int[] direction = new Vector2Int[]
+    {
+        new Vector2Int(1,0),
+        new Vector2Int(-1,0),
+        new Vector2Int(0,1),
+        new Vector2Int(0,-1),
+    };
     private Dictionary<Vector2Int, GameObject> dungeonRooms = new Dictionary<Vector2Int, GameObject>();
     private Queue<Vector2Int> roomQueue = new Queue<Vector2Int>();
     private Vector2Int[] directions = new Vector2Int[]
@@ -22,48 +28,42 @@ public class DungeonGenerator : MonoBehaviour
 
     void Start()
     {
-        Vector2Int startPos = Vector2Int.zero;
-        PlaceRoom(startPos);
-        roomQueue.Enqueue(startPos);
+        GenerateDungeon();
     }
-
-    void Update()
+    void GenerateDungeon()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        Queue<Vector2Int> frontier = new Queue<Vector2Int>();
+        Vector2Int start = Vector2Int.zero;
+
+
+        //need to place the room
+        PlaceRoom(start);
+        //then add to queue
+        frontier.Enqueue(start);
+        //then while loop to place the rest of the rooms
+        while (frontier.Count > 0 && roomsPlaced < maxRooms )
         {
-            GenerateNextRoom();
-        }
-    }
+            Vector2Int current = frontier.Dequeue();
+            Debug.Log("FUCK");
 
-    void GenerateNextRoom()
-    {
-        if (roomQueue.Count == 0 || roomsPlaced >= maxRooms)
-        {
-            Debug.Log("No more rooms to generate or max rooms reached!");
-            return;
-        }
+            int branches = Random.Range(1, 4);
 
-        Vector2Int currentPos = roomQueue.Dequeue();
-
-        foreach (Vector2Int dir in directions)
-        {
-            Vector2Int newPos = currentPos + dir;
-
-            if (Mathf.Abs(newPos.x) >= width / 2 || Mathf.Abs(newPos.y) >= height / 2)
-                continue;
-
-            if (!dungeonRooms.ContainsKey(newPos) && roomsPlaced < maxRooms)
+            for (int i = 0; i < branches; i++)
             {
-                GameObject newRoom = PlaceRoom(newPos);
-                roomQueue.Enqueue(newPos);
+                Vector2Int dir = direction[Random.Range(0, directions.Length)];
+                Vector2Int newPos = current + dir;
 
-                Debug.Log($"Placed room at world position: {newRoom.transform.position}");
+                if (!dungeonRooms.ContainsKey(newPos))
+                {
+                    PlaceRoom(newPos);
+                    frontier.Enqueue(newPos);
+                }
+                if (roomsPlaced >= maxRooms) break;
 
-                break; 
             }
+            
         }
     }
-
     Vector3 roomSize = new Vector3(6, 6, 0);
     GameObject PlaceRoom(Vector2Int pos)
     {
