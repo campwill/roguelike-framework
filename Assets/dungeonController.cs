@@ -71,16 +71,18 @@ public class DungeonGenerator : MonoBehaviour
     }
 
     Vector3 roomSize = new Vector3(6, 6, 0);
-
-    GameObject PlaceRoom(Vector2Int pos)
-    {
-        Vector3 worldPos = new Vector3(pos.x * roomSize.x, pos.y * roomSize.y, 1f);
-        GameObject room = Instantiate(room1DoorPrefab, worldPos, Quaternion.identity, transform);
-        dungeonRooms[pos] = room;
-        roomsPlaced++;
-        return room;
-    }
-
+GameObject PlaceRoom(Vector2Int pos)
+{
+Vector3 worldPos = new Vector3(
+    Mathf.Round(pos.x * roomSize.x),
+    Mathf.Round(pos.y * roomSize.y),
+    1f
+);    
+    GameObject room = Instantiate(room1DoorPrefab, worldPos, Quaternion.identity, transform);
+    dungeonRooms[pos] = room;
+    roomsPlaced++;
+    return room;
+}
    void UpdateRoom(Vector2Int pos)
 {
     if (!dungeonRooms.ContainsKey(pos)) return;
